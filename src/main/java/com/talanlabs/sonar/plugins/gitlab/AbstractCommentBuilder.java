@@ -111,6 +111,7 @@ public abstract class AbstractCommentBuilder {
         root.put("commentNoIssue", gitLabPluginConfiguration.commentNoIssue());
         root.put("sonarUrl", gitLabPluginConfiguration.baseUrl());
         root.put("publishMode", analysisMode.isPublish());
+        root.put("projectKey", gitLabPluginConfiguration.projectKey());
         // Report
         root.put("revision", revision);
         Arrays.stream(Severity.values()).forEach(severity -> root.put(severity.name(), severity));
