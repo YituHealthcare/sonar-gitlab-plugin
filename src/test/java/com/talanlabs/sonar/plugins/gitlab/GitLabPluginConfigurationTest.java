@@ -48,6 +48,7 @@ public class GitLabPluginConfigurationTest {
     public void before() {
         settings = new MapSettings(new PropertyDefinitions(GitLabPlugin.definitions()));
         settings.setProperty(CoreProperties.SERVER_BASE_URL, "http://myserver");
+        settings.setProperty(CoreProperties.PROJECT_KEY_PROPERTY, "myProject");
         config = new GitLabPluginConfiguration(settings.asConfig(), new System2());
     }
 
@@ -64,6 +65,16 @@ public class GitLabPluginConfigurationTest {
         settings.removeProperty("sonar.host.url");
         config = new GitLabPluginConfiguration(settings.asConfig(), new System2());
         Assertions.assertThat(config.baseUrl()).isEqualTo("http://localhost:9000/");
+    }
+
+    @Test
+    public void testProjectKey() {
+        Assertions.assertThat(config.projectKey()).isEqualTo("myProject");
+
+        settings.removeProperty(CoreProperties.PROJECT_KEY_PROPERTY);
+        settings.setProperty("sonar.projectKey", "myProject2");
+        config = new GitLabPluginConfiguration(settings.asConfig(), new System2());
+        Assertions.assertThat(config.projectKey()).isEqualTo("myProject2");
     }
 
     @Test
