@@ -285,6 +285,12 @@ public class GitLabApiV4Wrapper implements IGitLabApiWrapper {
 
     private void createReviewDiscussion(String fullPath, Integer lineNumber, String body) throws IOException {
         Integer projectId = gitLabProject.getId();
+
+        Integer mergeRequestTargetProjectId = config.mergeRequestTargetProjectId();
+        if( mergeRequestTargetProjectId != -1  && !projectId.equals(mergeRequestTargetProjectId)){
+            projectId = mergeRequestTargetProjectId;
+        }
+
         int mergeRequestIid = config.mergeRequestIid();
 
         checkArgument(mergeRequestIid != -1, "The merge request iid must be provided.");

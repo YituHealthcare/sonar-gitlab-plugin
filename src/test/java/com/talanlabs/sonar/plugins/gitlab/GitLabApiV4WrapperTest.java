@@ -173,9 +173,11 @@ public class GitLabApiV4WrapperTest {
     public void testCreateReviewDiscussionEmptyMergeRequestDiffsFail() throws Exception {
         Integer projectId = 1;
         Integer mrIid = 1;
+        Integer mergeRequestTargetProjectId = 1;
 
         GitLabPluginConfiguration gitLabPluginConfiguration = mock(GitLabPluginConfiguration.class);
         when(gitLabPluginConfiguration.mergeRequestIid()).thenReturn(mrIid);
+        when(gitLabPluginConfiguration.mergeRequestTargetProjectId()).thenReturn(mergeRequestTargetProjectId);
         when(gitLabPluginConfiguration.isMergeRequestDiscussionEnabled()).thenReturn(true);
 
         GitLabApiV4Wrapper facade = new GitLabApiV4Wrapper(gitLabPluginConfiguration);
@@ -208,9 +210,12 @@ public class GitLabApiV4WrapperTest {
     public void testCreateReviewDiscussionMissing() throws Exception {
         Integer projectId = 1;
         Integer mrIid = 1;
+        Integer mergeRequestTargetProjectId = 1;
+
 
         GitLabPluginConfiguration gitLabPluginConfiguration = mock(GitLabPluginConfiguration.class);
         when(gitLabPluginConfiguration.mergeRequestIid()).thenReturn(mrIid);
+        when(gitLabPluginConfiguration.mergeRequestTargetProjectId()).thenReturn(mergeRequestTargetProjectId);
         when(gitLabPluginConfiguration.isMergeRequestDiscussionEnabled()).thenReturn(true);
 
         GitLabApiV4Wrapper facade = new GitLabApiV4Wrapper(gitLabPluginConfiguration);
@@ -238,6 +243,45 @@ public class GitLabApiV4WrapperTest {
         facade.createOrUpdateReviewComment(null, "src/main/Foo.java", 5, "nothing");
 
         verify(mergeRequestDiscussion).createDiscussion(Matchers.eq(projectId), Matchers.eq(mrIid), anyObject());
+    }
+
+    @Test
+    public void testCreateReviewDiscussionInPullRequestSituation() throws Exception {
+        Integer projectId = 1;
+        Integer mrIid = 1;
+        Integer mergeRequestTargetProjectId = 2;
+
+
+        GitLabPluginConfiguration gitLabPluginConfiguration = mock(GitLabPluginConfiguration.class);
+        when(gitLabPluginConfiguration.mergeRequestIid()).thenReturn(mrIid);
+        when(gitLabPluginConfiguration.mergeRequestTargetProjectId()).thenReturn(mergeRequestTargetProjectId);
+        when(gitLabPluginConfiguration.isMergeRequestDiscussionEnabled()).thenReturn(true);
+
+        GitLabApiV4Wrapper facade = new GitLabApiV4Wrapper(gitLabPluginConfiguration);
+
+        GitLabAPI gitLabAPI = mock(GitLabAPI.class);
+        facade.setGitLabAPI(gitLabAPI);
+
+        Paged paged = mock(Paged.class);
+
+        GitLabAPIMergeRequestDiff gitLabAPIMergeRequestDiff = mock(GitLabAPIMergeRequestDiff.class);
+        when(gitLabAPIMergeRequestDiff.getMergeRequestDiff(mergeRequestTargetProjectId, mrIid)).thenReturn(paged);
+
+        GitlabMergeRequestDiff mergeRequestDiff = gitlabMergeRequestDiff(mrIid);
+
+        when(gitLabAPI.getGitLabAPIMergeRequestDiff()).thenReturn(gitLabAPIMergeRequestDiff);
+        when(paged.getResults()).thenReturn(Collections.singletonList(mergeRequestDiff));
+
+        GitLabProject gitLabProject = mock(GitLabProject.class);
+        when(gitLabProject.getId()).thenReturn(projectId);
+        facade.setGitLabProject(gitLabProject);
+
+        GitLabAPIMergeRequestDiscussion mergeRequestDiscussion = mock(GitLabAPIMergeRequestDiscussion.class);
+        when(gitLabAPI.getGitLabAPIMergeRequestDiscussion()).thenReturn(mergeRequestDiscussion);
+
+        facade.createOrUpdateReviewComment(null, "src/main/Foo.java", 5, "nothing");
+
+        verify(mergeRequestDiscussion).createDiscussion(Matchers.eq(mergeRequestTargetProjectId), Matchers.eq(mrIid), anyObject());
     }
 
     private GitlabMergeRequestDiff gitlabMergeRequestDiff(int mrIid) {

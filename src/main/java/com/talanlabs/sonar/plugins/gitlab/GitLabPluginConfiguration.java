@@ -282,4 +282,8 @@ public class GitLabPluginConfiguration {
         return configuration.get("sonar.projectKey").orElse(null);
     }
 
+    public int mergeRequestTargetProjectId() {
+        return configuration.getInt(GitLabPlugin.GITLAB_CI_MERGE_REQUEST_PROJECT_ID).orElse(-1);
+    }
+
 }
