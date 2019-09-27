@@ -68,6 +68,7 @@ public class GitLabPlugin implements Plugin {
     public static final String GITLAB_DISABLE_PROXY = "sonar.gitlab.disable_proxy";
     public static final String GITLAB_MERGE_REQUEST_DISCUSSION = "sonar.gitlab.merge_request_discussion";
     public static final String GITLAB_CI_MERGE_REQUEST_IID = "sonar.gitlab.ci_merge_request_iid";
+    public static final String GITLAB_CI_MERGE_REQUEST_PROJECT_ID = "sonar.gitlab.ci_merge_request_project_id";
 
     public static final String CATEGORY = "gitlab";
     public static final String SUBCATEGORY = "reporting";
@@ -166,8 +167,11 @@ public class GitLabPlugin implements Plugin {
                         PropertyDefinition.builder(GITLAB_CI_MERGE_REQUEST_IID).name("Merge Request IID").description("The IID of the merge request if it’s pipelines for merge requests")
                                 .category(CATEGORY).subCategory(SUBCATEGORY).type(PropertyType.INTEGER)
                                 .defaultValue(String.valueOf(-1))
-                                .index(35).build()
-
+                                .index(35).build(),
+                        PropertyDefinition.builder(GITLAB_CI_MERGE_REQUEST_PROJECT_ID).name("Merge Request TARGET PROJECT ID").description("The ID of the merge request target project if it’s pipelines for merge requests")
+                                .category(CATEGORY).subCategory(SUBCATEGORY).type(PropertyType.INTEGER)
+                                .defaultValue(String.valueOf(-1))
+                                .index(36).build()
                 );
     }
 
